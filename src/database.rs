@@ -166,7 +166,8 @@ impl DB {
     }
 
     pub fn print_bookmark(&self, bookmark: Bookmark) {
-        println!("{} {} {}", bookmark.id, bookmark.title, bookmark.url);
+        let space = "    ";
+        println!("{} {}\n{}{}", bookmark.id, bookmark.title, space, bookmark.url);
 
         let tags = self.get_tags(&bookmark).unwrap();
         let t: Vec<&str> = tags.iter().map(AsRef::as_ref).collect();
@@ -174,7 +175,7 @@ impl DB {
         if t.join("") == "" {
             println!("");
         } else {
-            println!("{}\n", t.join(", "));
+            println!("{}{}\n", space, t.join(", "));
         }
     }
 
