@@ -37,12 +37,20 @@ fn main() {
                                          (Delete all bookmarks if id is not specified)'").required(false))
                     .arg(Arg::from_usage("-T 'Delete all tags'"))
                     .arg(Arg::from_usage("-t --tag_id=[id]... 'Delete tags matching the specified ids'")))
+        .subcommand(SubCommand::with_name("update")
+                    .about("Update bookmark")
+                    .arg(Arg::from_usage("<ID> 'Update bookmark matching the specified id'"))
+                    .arg(Arg::from_usage("-u --url=[url] 'Update bookmark URL'"))
+                    .arg(Arg::from_usage("-i --title=[title] 'Update bookmark title'"))
+                    .arg(Arg::from_usage("-t --tag=[tag]... 'Update bookmark tags'"))
+                    .after_help("If no option is specified, get title from url and update."))
         .get_matches();
 
     match args.subcommand() {
         ("print", Some(args)) => cmd::print::execute(args),
         ("add" , Some(args)) => cmd::add::execute(args),
         ("delete", Some(args)) => cmd::delete::execute(args),
+        ("update", Some(args)) => cmd::update::execute(args),
         _ => process::exit(1),
     }
 }

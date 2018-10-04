@@ -160,6 +160,28 @@ impl DB {
         self.conn.query_row(query.as_str(), &[&id], |r| r.get(0)).unwrap()
     }
 
+    pub fn update(&self, id: i64, bookmark: &Bookmark) {
+        let query = "Update bookmarks SET title = $1, url = $2 WHERE id=?";
+        self.conn.execute(query, &[&bookmark.title, &bookmark.url, &id])
+            .expect("Failed to update");
+    }
+
+    pub fn get_url_by_id(&self, id: i64) -> String {
+        let query = "SELECT url FROM bookmarks WHERE id=?";
+        let url: String = self.conn.query_row(
+            query, &[&id], |r| r.get(0)).expect("no match index");
+
+        url
+    }
+
+    pub fn get_title_by_id(&self, id: i64) -> String {
+        let query = "SELECT title FROM bookmarks WHERE id=?";
+        let title = self.conn.query_row(
+            query, &[&id], |r| r.get(0)).expect("no match index");
+
+        title
+    }
+
     pub fn get_record_count(&self, table_name: &str) -> i64 {
         let query = format!("SELECT count(*) from {}", table_name);
         self.conn.query_row(query.as_str(), &[], |r| r.get(0)).unwrap()
