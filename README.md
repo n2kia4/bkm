@@ -35,5 +35,6 @@ SUBCOMMANDS:
     print     Print bookmark
     add       Add bookmark
     delete    Delete bookmark
+    update    Update bookmark
     help      Prints this message or the help of the given subcommand(s)
 ```
