@@ -1,7 +1,16 @@
-use clap::ArgMatches;
+use clap::{App, Arg, ArgMatches, SubCommand};
 use std::{io, process};
 
 use database::DB;
+
+pub fn make_subcommand<'a, 'b>() -> App<'a, 'b> {
+    SubCommand::with_name("delete")
+        .about("Delete bookmark")
+        .arg(Arg::from_usage("<ID>... 'Delete bookmarks matching the specified ids{n}\
+                             (If id is not specified, delete all bookmarks)'").required(false))
+        .arg_from_usage("-T 'Delete all tags'")
+        .arg_from_usage("-t --tag_id=[id]... 'Delete tags matching the specified ids'")
+}
 
 pub fn execute(args: &ArgMatches) {
     let db = DB::open();

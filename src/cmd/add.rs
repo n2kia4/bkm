@@ -1,8 +1,16 @@
-use clap::ArgMatches;
+use clap::{App, ArgMatches, SubCommand};
 use std::process;
 
 use database::{DB, Bookmark};
 use get_title_from_url;
+
+pub fn make_subcommand<'a, 'b>() -> App<'a, 'b> {
+    SubCommand::with_name("add")
+        .about("Add bookmark")
+        .arg_from_usage("<URL> 'Bookmark URL'")
+        .arg_from_usage("-t --tag=[tag]... 'Add tags to bookmark'")
+        .arg_from_usage("-i --title=[title] 'Decide bookmark title yourself'")
+}
 
 pub fn execute(args: &ArgMatches) {
     let db = DB::open();

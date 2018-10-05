@@ -1,7 +1,15 @@
-use clap::ArgMatches;
+use clap::{App, Arg, ArgMatches, SubCommand};
 use std::process;
 
 use database::DB;
+
+pub fn make_subcommand<'a, 'b>() -> App<'a, 'b> {
+    SubCommand::with_name("print")
+        .about("Print bookmark")
+        .arg(Arg::from_usage("<ID>... 'Print bookmarks matching the specified ids{n}\
+                             (If id is not specified, print all bookmarks)'").required(false))
+        .arg_from_usage("-T 'Print all tags'")
+}
 
 pub fn execute(args: &ArgMatches) {
     let db = DB::open();
