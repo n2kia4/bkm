@@ -5,7 +5,7 @@ bkm is a simple bookmark manager written in Rust.
 
 ## Installation
 
-This requires at least Rust 1.20 and Cargo to be installed. Type the following in the terminal:
+This requires at least Rust 1.27 and Cargo to be installed. Type the following in the terminal:
 
 ```
 $ cargo install --git https://github.com/n2kia4/bkm.git
@@ -24,6 +24,8 @@ $ cargo build
 bkm requires to specify a subcommand. In order to see what subcommands are available, run `bkm -h`
 
 ```
+Bookmark manager
+
 USAGE:
     bkm <SUBCOMMAND>
 
@@ -37,4 +39,24 @@ SUBCOMMANDS:
     delete    Delete bookmark
     update    Update bookmark
     help      Prints this message or the help of the given subcommand(s)
+```
+
+To check options of the subcommand, run `bkm <SUBCOMMAND> -h`
+
+```
+Add bookmark
+
+USAGE:
+    bkm add [OPTIONS] <URL>
+
+FLAGS:
+    -h, --help       Prints help information
+    -V, --version    Prints version information
+
+OPTIONS:
+    -t, --tag <tag>...     Add tags to bookmark
+    -i, --title <title>    Decide bookmark title yourself
+
+ARGS:
+    <URL>    Bookmark URL
 ```
