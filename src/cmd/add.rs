@@ -15,21 +15,15 @@ pub fn make_subcommand<'a, 'b>() -> App<'a, 'b> {
 pub fn execute(args: &ArgMatches) {
     let db = DB::open();
 
-    let id = db.get_record_count("bookmarks") + 1;
     let url = args.value_of("URL").unwrap();
+
     let title = if let Some(title) = args.value_of("title") {
         title.to_string()
     } else {
         get_title_from_url(url)
     };
 
-    let bookmark = Bookmark::new(
-        id,
-        title,
-        url.to_string()
-    );
-
-    match db.add_bookmark(&bookmark) {
+    match db.add_bookmark(&title, &url.to_string()) {
         Ok(_) => {},
         Err(e) => {
             println!("{}", e);
@@ -37,11 +31,17 @@ pub fn execute(args: &ArgMatches) {
         }
     }
 
+    let id = db.get_max_bookmark_id();
+
     if let Some(tags) = args.values_of("tag") {
         for tag in tags {
             db.add_tag(id, tag);
         }
     }
+
+    let bookmark = Bookmark::new(
+        id, title, url.to_string()
+    );
 
     db.print_bookmark(bookmark);
 }

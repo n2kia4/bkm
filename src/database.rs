@@ -112,10 +112,10 @@ impl DB {
         tags
     }
 
-    pub fn add_bookmark(&self, bookmark: &Bookmark) -> Result<(), &str> {
+    pub fn add_bookmark(&self, title: &String, url: &String) -> Result<(), &str> {
         let query = "INSERT INTO bookmarks (title, url) VALUES ($1, $2)";
 
-        match self.conn.execute(query, &[&bookmark.title, &bookmark.url]) {
+        match self.conn.execute(query, &[title, url]) {
             Ok(_) => Ok(()),
             Err(_) => Err("Error: URL already exists"),
         }
@@ -185,6 +185,11 @@ impl DB {
     pub fn get_record_count(&self, table_name: &str) -> i64 {
         let query = format!("SELECT count(*) from {}", table_name);
         self.conn.query_row(query.as_str(), &[], |r| r.get(0)).unwrap()
+    }
+
+    pub fn get_max_bookmark_id(&self) -> i64 {
+        let query = "SELECT MAX(id) FROM bookmarks";
+        self.conn.query_row(query, &[], |r| r.get(0)).unwrap()
     }
 
     pub fn print_bookmark(&self, bookmark: Bookmark) {
