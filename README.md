@@ -38,6 +38,7 @@ SUBCOMMANDS:
     add       Add bookmark
     delete    Delete bookmark
     update    Update bookmark
+    open      Open bookmark
     help      Prints this message or the help of the given subcommand(s)
 ```
 
