@@ -4,6 +4,7 @@ extern crate dirs;
 extern crate reqwest;
 extern crate rusqlite;
 extern crate select;
+extern crate webbrowser;
 
 use clap::{App, AppSettings};
 use select::document::Document;
@@ -25,6 +26,7 @@ fn main() {
         .subcommand(cmd::add::make_subcommand())
         .subcommand(cmd::delete::make_subcommand())
         .subcommand(cmd::update::make_subcommand())
+        .subcommand(cmd::open::make_subcommand())
         .get_matches();
 
     match args.subcommand() {
@@ -32,6 +34,7 @@ fn main() {
         ("add" , Some(args)) => cmd::add::execute(args),
         ("delete", Some(args)) => cmd::delete::execute(args),
         ("update", Some(args)) => cmd::update::execute(args),
+        ("open", Some(args)) => cmd::open::execute(args),
         _ => process::exit(1),
     }
 }
