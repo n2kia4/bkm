@@ -61,3 +61,100 @@ OPTIONS:
 ARGS:
     <URL>    Bookmark URL
 ```
+
+
+## Examples
+
+### `Print`
+
+Print all bookmarks:
+
+```
+$ bkm print
+```
+
+Print bookmarks at index 1 and 2:
+
+```
+$ bkm print 1 2
+```
+
+Print all tags:
+
+```
+$ bkm print -T
+```
+
+### `Add`
+
+Add bookmark with tags "git" and "hosting service":
+
+```
+$ bkm add https://github.com -t git "hosting service"
+1 The world’s leading software development platform · GitHub
+    https://github.com
+    git, hosting service
+```
+
+Add bookmark with tags "git" and "hosting service", title "GitHub":
+
+```
+$ bkm add https://github.com -t git "hosting service" -i GitHub
+1 GitHub
+    https://github.com
+    git, hosting service
+```
+
+### `delete`
+
+Delete all bookmarks:
+
+```
+$ bkm delete
+```
+
+Delete bookmarks at index 1 and 2:
+
+```
+$ bkm delete 1 2
+```
+
+Delete all tags:
+
+```
+$ bkm delete -T
+```
+
+Delete tags at index 1 and 2:
+
+```
+$ bkm delete -t 1 2
+```
+
+### `update`
+
+Update bookmark URL and title at index 1:
+
+```
+$ bkm update 1 -u https://github.com/n2kia4/bkm -i "bkm"
+```
+
+Update bookmark tags at index 1:
+
+```
+$ bkm update 1 -t github "bookmark manager" Rust
+```
+
+Get and update title from bookmark URL at index 1:
+
+```
+$ bkm update 1
+```
+
+### `open`
+
+Open bookmark at index 1 and 2 in browser:
+
+```
+$ bkm open 1 2
+```
