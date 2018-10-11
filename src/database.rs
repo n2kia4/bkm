@@ -36,26 +36,28 @@ impl DB {
 
         let full_path = format!("{}/bookmarks.db", bkm_dir);
         let conn = Connection::open(full_path).unwrap();
+        let db = DB { conn: conn };
 
-        conn.execute("CREATE TABLE IF NOT EXISTS bookmarks (
+        db.init();
+        db
+    }
+
+    fn init(&self) {
+        self.conn.execute("CREATE TABLE IF NOT EXISTS bookmarks (
             id    INTEGER PRIMARY KEY,
             title    TEXT NOT NULL,
             url    TEXT NOT NULL UNIQUE
         )", &[]).unwrap();
 
-        conn.execute("CREATE TABLE IF NOT EXISTS tags (
+        self.conn.execute("CREATE TABLE IF NOT EXISTS tags (
             id    INTEGER PRIMARY KEY,
             name    TEXT NOT NULL UNIQUE
         )", &[]).unwrap();
 
-        conn.execute("CREATE TABLE IF NOT EXISTS bookmark_tag (
+        self.conn.execute("CREATE TABLE IF NOT EXISTS bookmark_tag (
             bookmark_id    INTEGER NOT NULL,
             tag_id    INTEGER NOT NULL
         )", &[]).unwrap();
-
-        DB {
-            conn: conn
-        }
     }
 
     pub fn get_all_bookmark(&self) -> Vec<Bookmark> {
