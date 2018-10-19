@@ -39,7 +39,7 @@ pub fn execute(args: &ArgMatches) {
     let mut tags: Vec<String> = Vec::new();
 
     if let Some(tag) = args.values_of("tag") {
-        db.delete_bookmark_tag("bookmark_id", id);
+        db.delete_bookmark_tag_by_id(id);
         for t in tag {
             db.add_tag(id, t);
             tags.push(t.to_string());

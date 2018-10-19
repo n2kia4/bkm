@@ -122,14 +122,28 @@ impl DB {
         self.conn.execute(query, &[&bookmark_id, &tag_id]).unwrap();
     }
 
-    pub fn delete(&self, table_name: &str, id: i64) {
-        let query = format!("DELETE FROM {} WHERE id=?", table_name);
-        self.conn.execute(query.as_str(), &[&id]).unwrap();
+    pub fn delete_bookmark(&self, id: i64) {
+        self.delete_bookmark_tag_by_id(id);
+
+        let query = "DELETE FROM bookmarks WHERE id=?";
+        self.conn.execute(query, &[&id]).unwrap();
     }
 
-    pub fn delete_bookmark_tag(&self, column: &str, id: i64) {
-        let query = format!("DELETE FROM bookmark_tag WHERE {}=?", column);
-        self.conn.execute(query.as_str(), &[&id]).unwrap();
+    pub fn delete_bookmark_tag_by_id(&self, id: i64) {
+        let query = "DELETE FROM bookmark_tag WHERE bookmark_id=?";
+        self.conn.execute(query, &[&id]).unwrap();
+    }
+
+    pub fn delete_tag(&self, name: &str) {
+        self.delete_bookmark_tag_by_name(name);
+
+        let query = "DELETE FROM tags WHERE name=?";
+        self.conn.execute(query, &[&name]).unwrap();
+    }
+
+    fn delete_bookmark_tag_by_name(&self, name: &str) {
+        let query = "DELETE FROM bookmark_tag WHERE tag_id IN (SELECT id FROM tags WHERE name=?)";
+        self.conn.execute(query, &[&name]).unwrap();
     }
 
     pub fn clear(&self, table_name: &str) {
@@ -137,9 +151,14 @@ impl DB {
         self.conn.execute(query.as_str(), &[]).unwrap();
     }
 
-    pub fn check_existence(&self, table_name: &str, id: i64) -> i64 {
-        let query = format!("SELECT COUNT(*) FROM {} WHERE id=?", table_name);
-        self.conn.query_row(query.as_str(), &[&id], |r| r.get(0)).unwrap()
+    pub fn check_existence_bookmark(&self, id: i64) -> i64 {
+        let query = "SELECT COUNT(*) FROM bookmarks WHERE id=?";
+        self.conn.query_row(query, &[&id], |r| r.get(0)).unwrap()
+    }
+
+    pub fn check_existence_tag(&self, name: &str) -> i64 {
+        let query = "SELECT COUNT(*) FROM tags WHERE name=?";
+        self.conn.query_row(query, &[&name], |r| r.get(0)).unwrap()
     }
 
     pub fn update(&self, bookmark: &Bookmark) {

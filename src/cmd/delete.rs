@@ -9,7 +9,7 @@ pub fn make_subcommand<'a, 'b>() -> App<'a, 'b> {
         .arg(Arg::from_usage("<ID>... 'Delete bookmarks matching the specified ids{n}\
                              (If id is not specified, delete all bookmarks)'").required(false))
         .arg_from_usage("-T 'Delete all tags'")
-        .arg_from_usage("-t --tag_id=[id]... 'Delete tags matching the specified ids'")
+        .arg_from_usage("-t --tag=[tag]... 'Delete tags matching the specified tags'")
 }
 
 pub fn execute(args: &ArgMatches) {
@@ -24,16 +24,15 @@ pub fn execute(args: &ArgMatches) {
         process::exit(0);
     }
 
-    if args.is_present("tag_id") {
-        let ids = values_t!(args, "tag_id", i64).unwrap();
-        for id in ids {
-            let result: i64 = db.check_existence("tags", id);
+    if args.is_present("tag") {
+        let tags = args.values_of("tag").unwrap();
+        for tag in tags {
+            let result: i64 = db.check_existence_tag(tag);
             if result == 1 {
-                db.delete("tags", id);
-                db.delete_bookmark_tag("tag_id", id);
-                println!("Index {} deleted", id);
+                db.delete_tag(tag);
+                println!("Tag \"{}\" deleted", tag);
             } else {
-                println!("Error: No match index");
+                println!("Error: No tag matching \"{}\"", tag);
             }
         }
 
@@ -52,10 +51,9 @@ pub fn execute(args: &ArgMatches) {
 
     let ids = values_t!(args, "ID", i64).unwrap();
     for id in ids {
-        let result: i64 = db.check_existence("bookmarks", id);
+        let result: i64 = db.check_existence_bookmark(id);
         if result == 1 {
-            db.delete("bookmarks", id);
-            db.delete_bookmark_tag("bookmark_id", id);
+            db.delete_bookmark(id);
             println!("Index {} deleted", id);
         } else {
             println!("Error: No match index");
