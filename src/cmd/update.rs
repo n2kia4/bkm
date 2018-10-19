@@ -1,6 +1,8 @@
 use clap::{App, ArgMatches, SubCommand};
 
-use database::{DB, Bookmark};
+use bookmark::Bookmark;
+use database::DB;
+
 use get_title_from_url;
 
 pub fn make_subcommand<'a, 'b>() -> App<'a, 'b> {
@@ -34,14 +36,17 @@ pub fn execute(args: &ArgMatches) {
         db.get_title_by_id(id)
     };
 
-    if let Some(tags) = args.values_of("tag") {
+    let mut tags: Vec<String> = Vec::new();
+
+    if let Some(tag) = args.values_of("tag") {
         db.delete_bookmark_tag("bookmark_id", id);
-        for tag in tags {
-            db.add_tag(id, tag);
+        for t in tag {
+            db.add_tag(id, t);
+            tags.push(t.to_string());
         }
     }
 
-    let bookmark = Bookmark::new(id, title, url);
-    db.update(id, &bookmark);
-    db.print_bookmark(bookmark);
+    let bookmark = Bookmark::new(id, title, url, tags);
+    db.update(&bookmark);
+    bookmark.print();
 }

@@ -12,6 +12,7 @@ use select::predicate::Name;
 use std::process;
 
 mod cmd;
+mod bookmark;
 mod database;
 
 fn main() {

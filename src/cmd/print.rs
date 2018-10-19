@@ -22,7 +22,7 @@ pub fn execute(args: &ArgMatches) {
 
         let tags = db.get_all_tag();
         for tag in tags {
-            println!("{} {}", tag.id, tag.name);
+            println!("{}", tag);
         }
 
         process::exit(0);
@@ -36,7 +36,7 @@ pub fn execute(args: &ArgMatches) {
 
         let bookmarks = db.get_all_bookmark();
         for bookmark in bookmarks {
-            db.print_bookmark(bookmark);
+            bookmark.print();
         }
 
         process::exit(0);
@@ -46,7 +46,7 @@ pub fn execute(args: &ArgMatches) {
     for id in ids {
         match db.get_bookmark_by_id(id) {
             Ok(b) => {
-                db.print_bookmark(b);
+                b.print();
             },
             Err(e) => println!("{} {}", e, id),
         }

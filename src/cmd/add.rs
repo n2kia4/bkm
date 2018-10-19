@@ -1,7 +1,9 @@
 use clap::{App, ArgMatches, SubCommand};
 use std::process;
 
-use database::{DB, Bookmark};
+use bookmark::Bookmark;
+use database::DB;
+
 use get_title_from_url;
 
 pub fn make_subcommand<'a, 'b>() -> App<'a, 'b> {
@@ -33,15 +35,18 @@ pub fn execute(args: &ArgMatches) {
 
     let id = db.get_max_bookmark_id();
 
-    if let Some(tags) = args.values_of("tag") {
-        for tag in tags {
-            db.add_tag(id, tag);
+    let mut tags: Vec<String> = Vec::new();
+
+    if let Some(tag) = args.values_of("tag") {
+        for t in tag {
+            db.add_tag(id, t);
+            tags.push(t.to_string());
         }
     }
 
     let bookmark = Bookmark::new(
-        id, title, url.to_string()
+        id, title, url.to_string(), tags
     );
 
-    db.print_bookmark(bookmark);
+    bookmark.print();
 }

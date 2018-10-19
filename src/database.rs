@@ -4,24 +4,7 @@ use dirs;
 use std::fs;
 use std::path::Path;
 
-pub struct Bookmark {
-    id: i64,
-    title: String,
-    url: String
-}
-
-impl Bookmark {
-    pub fn new(id: i64, title: String, url: String) -> Self {
-        Bookmark {
-            id, title, url
-        }
-    }
-}
-
-pub struct Tag {
-    pub id: i64,
-    pub name: String
-}
+use bookmark::Bookmark;
 
 pub struct DB {
     conn: Connection
@@ -68,7 +51,8 @@ impl DB {
             Bookmark {
                 id: r.get(0),
                 title: r.get(1),
-                url: r.get(2)
+                url: r.get(2),
+                tags: self.get_tags(r.get(0)).unwrap()
             }
         }).unwrap();
 
@@ -87,7 +71,8 @@ impl DB {
             Bookmark {
                 id: r.get(0),
                 title: r.get(1),
-                url: r.get(2)
+                url: r.get(2),
+                tags: self.get_tags(r.get(0)).unwrap()
             }
         }) {
             Ok(b) => Ok(b),
@@ -95,18 +80,13 @@ impl DB {
         }
     }
 
-    pub fn get_all_tag(&self) -> Vec<Tag> {
+    pub fn get_all_tag(&self) -> Vec<String> {
         let query = "SELECT * FROM tags";
         let mut stmt = self.conn.prepare(query).unwrap();
 
-        let tag_iter = stmt.query_map(&[], |r| {
-            Tag {
-                id: r.get(0),
-                name: r.get(1)
-            }
-        }).unwrap();
+        let tag_iter = stmt.query_map(&[], |r| r.get(1)).unwrap();
 
-        let mut tags: Vec<Tag> = Vec::new();
+        let mut tags: Vec<String> = Vec::new();
         for tag in tag_iter {
             tags.push(tag.unwrap());
         }
@@ -127,7 +107,7 @@ impl DB {
         let select_query = "SELECT id FROM tags WHERE name=?";
         let insert_query = "INSERT INTO tags (name) VALUES ($1)";
 
-        match self.conn.query_row(select_query, &[&tag], |r| { r.get(0) }) {
+        match self.conn.query_row(select_query, &[&tag], |r| r.get(0)) {
             Ok(tag_id) => self.add_bookmark_tag(id, tag_id),
             Err(_) => {
                 self.conn.execute(insert_query, &[&tag]).unwrap();
@@ -162,9 +142,9 @@ impl DB {
         self.conn.query_row(query.as_str(), &[&id], |r| r.get(0)).unwrap()
     }
 
-    pub fn update(&self, id: i64, bookmark: &Bookmark) {
+    pub fn update(&self, bookmark: &Bookmark) {
         let query = "Update bookmarks SET title = $1, url = $2 WHERE id=?";
-        self.conn.execute(query, &[&bookmark.title, &bookmark.url, &id])
+        self.conn.execute(query, &[&bookmark.title, &bookmark.url, &bookmark.id])
             .expect("Failed to update");
     }
 
@@ -194,24 +174,10 @@ impl DB {
         self.conn.query_row(query, &[], |r| r.get(0)).unwrap()
     }
 
-    pub fn print_bookmark(&self, bookmark: Bookmark) {
-        let space = "    ";
-        println!("{} {}\n{}{}", bookmark.id, bookmark.title, space, bookmark.url);
-
-        let tags = self.get_tags(&bookmark).unwrap();
-        let t: Vec<&str> = tags.iter().map(AsRef::as_ref).collect();
-
-        if t.join("") == "" {
-            println!("");
-        } else {
-            println!("{}{}\n", space, t.join(", "));
-        }
-    }
-
-    fn get_tags(&self, bookmark: &Bookmark) -> rusqlite::Result<Vec<String>> {
+    fn get_tags(&self, bookmark_id: i64) -> rusqlite::Result<Vec<String>> {
         let query = format!(
             "SELECT name FROM tags t LEFT JOIN bookmark_tag bt
-            ON bt.tag_id=t.id WHERE bt.bookmark_id='{}'", bookmark.id
+            ON bt.tag_id=t.id WHERE bt.bookmark_id='{}'", bookmark_id
         );
         let mut stmt = self.conn.prepare(query.as_str()).unwrap();
         let tag_iter = stmt.query_map(&[], |r| r.get(0))?;
