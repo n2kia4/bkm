@@ -39,6 +39,7 @@ SUBCOMMANDS:
     delete    Delete bookmark
     update    Update bookmark
     open      Open bookmark
+    search    Search bookmark
     help      Prints this message or the help of the given subcommand(s)
 ```
 
@@ -157,4 +158,18 @@ Open bookmark at index 1 and 2 in browser:
 
 ```
 $ bkm open 1 2
+```
+
+### `search`
+
+Search bookmarks that contains `rust` or `cli` in title or URL:
+
+```
+$ bkm search rust cli
+```
+
+Search bookmarks that contains `rust` or `cli` in tag:
+
+```
+$ bkm search -t rust cli
 ```
