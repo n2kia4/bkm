@@ -28,6 +28,7 @@ fn main() {
         .subcommand(cmd::delete::make_subcommand())
         .subcommand(cmd::update::make_subcommand())
         .subcommand(cmd::open::make_subcommand())
+        .subcommand(cmd::search::make_subcommand())
         .get_matches();
 
     match args.subcommand() {
@@ -36,6 +37,7 @@ fn main() {
         ("delete", Some(args)) => cmd::delete::execute(args),
         ("update", Some(args)) => cmd::update::execute(args),
         ("open", Some(args)) => cmd::open::execute(args),
+        ("search", Some(args)) => cmd::search::execute(args),
         _ => process::exit(1),
     }
 }

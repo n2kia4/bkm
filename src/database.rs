@@ -45,23 +45,7 @@ impl DB {
 
     pub fn get_all_bookmark(&self) -> Vec<Bookmark> {
         let query = "SELECT * FROM bookmarks";
-        let mut stmt = self.conn.prepare(query).unwrap();
-
-        let bookmark_iter = stmt.query_map(&[], |r| {
-            Bookmark {
-                id: r.get(0),
-                title: r.get(1),
-                url: r.get(2),
-                tags: self.get_tags(r.get(0)).unwrap()
-            }
-        }).unwrap();
-
-        let mut bookmarks: Vec<Bookmark> = Vec::new();
-        for bookmark in bookmark_iter {
-            bookmarks.push(bookmark.unwrap());
-        }
-
-        bookmarks
+        self.vectorize_bookmarks(query)
     }
 
     pub fn get_bookmark_by_id(&self, id: i64) -> Result<Bookmark, &str> {
@@ -165,6 +149,46 @@ impl DB {
         let query = "Update bookmarks SET title = $1, url = $2 WHERE id=?";
         self.conn.execute(query, &[&bookmark.title, &bookmark.url, &bookmark.id])
             .expect("Failed to update");
+    }
+
+    pub fn search(&self, keywords: Vec<&str>) -> Vec<Bookmark> {
+        let query = format!(
+            "SELECT * FROM bookmarks WHERE (title || url) LIKE \"%{}%\"",
+            keywords.join("%")
+        );
+
+        self.vectorize_bookmarks(query.as_str())
+    }
+
+    pub fn search_by_tag(&self, keywords: Vec<&str>) -> Vec<Bookmark> {
+        let query = format!(
+            "select b.id, b.title, b.url from bookmark_tag bt
+            inner join bookmarks b on b.id = bt.bookmark_id
+            inner join tags t on t.id = bt.tag_id
+            where t.name like \"%{}%\"", keywords.join("%")
+        );
+
+        self.vectorize_bookmarks(query.as_str())
+    }
+
+    fn vectorize_bookmarks(&self, query: &str) -> Vec<Bookmark> {
+        let mut stmt = self.conn.prepare(query).unwrap();
+
+        let bookmark_iter = stmt.query_map(&[], |r| {
+            Bookmark {
+                id: r.get(0),
+                title: r.get(1),
+                url: r.get(2),
+                tags: self.get_tags(r.get(0)).unwrap()
+            }
+        }).unwrap();
+
+        let mut bookmarks: Vec<Bookmark> = Vec::new();
+        for bookmark in bookmark_iter {
+            bookmarks.push(bookmark.unwrap());
+        }
+
+        bookmarks
     }
 
     pub fn get_url_by_id(&self, id: i64) -> String {
