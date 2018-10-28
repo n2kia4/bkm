@@ -3,7 +3,7 @@ use clap::{App, ArgMatches, SubCommand};
 use bookmark::Bookmark;
 use database::DB;
 
-use get_title_from_url;
+use utils::get_title_from_url;
 
 pub fn make_subcommand<'a, 'b>() -> App<'a, 'b> {
     SubCommand::with_name("update")

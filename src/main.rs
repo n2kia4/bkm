@@ -7,13 +7,12 @@ extern crate select;
 extern crate webbrowser;
 
 use clap::{App, AppSettings};
-use select::document::Document;
-use select::predicate::Name;
 use std::process;
 
 mod cmd;
 mod bookmark;
 mod database;
+mod utils;
 
 fn main() {
     let args = App::new("bkm")
@@ -40,11 +39,4 @@ fn main() {
         ("search", Some(args)) => cmd::search::execute(args),
         _ => process::exit(1),
     }
-}
-
-fn get_title_from_url(url: &str) -> String {
-    let res = reqwest::get(url).expect("invalid URL");
-    let doc = Document::from_read(res).unwrap();
-    let title = doc.find(Name("title")).next().unwrap().text();
-    title
 }
