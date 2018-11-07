@@ -233,3 +233,102 @@ impl DB {
         Ok(tags)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn test_data() -> Vec<Bookmark> {
+        let data: Vec<Bookmark> = vec![
+            (Bookmark {
+                id: 1,
+                title: "GitHub".to_string(),
+                url: "https://github.com".to_string(),
+                tags: vec!["Git".to_string(), "Hosting service".to_string()],
+            }),
+            (Bookmark {
+                id: 2,
+                title: "Google".to_string(),
+                url: "https://google.com".to_string(),
+                tags: vec!["Search".to_string()],
+            }),
+            (Bookmark {
+                id: 3,
+                title: "Example Domain".to_string(),
+                url: "https://example.com".to_string(),
+                tags: vec!["".to_string()],
+            }),
+        ];
+
+        data
+    }
+
+    fn open() -> DB {
+        let conn = Connection::open_in_memory().unwrap();
+        let db = DB { conn: conn};
+
+        db.init();
+        db
+    }
+
+    #[test]
+    fn test_get_bookmark_by_id() {
+        let db = open();
+
+        for bookmark in test_data() {
+            db.add_bookmark(&bookmark.title, &bookmark.url).unwrap();
+
+            let b = db.get_bookmark_by_id(bookmark.id).unwrap();
+            assert_eq!((bookmark.id, bookmark.title, bookmark.url),
+                       (b.id, b.title, b.url));
+        }
+    }
+
+    #[test]
+    fn test_add_bookmark() {
+        let db = open();
+
+        for bookmark in test_data() {
+            db.add_bookmark(&bookmark.title, &bookmark.url).unwrap();
+            assert!(db.get_bookmark_by_id(bookmark.id).is_ok());
+        }
+    }
+
+    #[test]
+    fn test_delete_bookmark() {
+        let db = open();
+        let bookmark = &test_data()[0];
+
+        db.add_bookmark(&bookmark.title, &bookmark.url).unwrap();
+        db.delete_bookmark(bookmark.id);
+        assert!(db.get_bookmark_by_id(bookmark.id).is_err());
+    }
+
+    #[test]
+    fn test_update_bookmark() {
+        let db = open();
+        let old_bookmark = &test_data()[0];
+        let new_bookmark = &test_data()[1];
+
+        db.add_bookmark(&old_bookmark.title, &old_bookmark.url).unwrap();
+        db.update_bookmark(old_bookmark.id, &new_bookmark.title, &new_bookmark.url);
+        assert!(db.get_bookmark_by_id(old_bookmark.id).is_ok());
+    }
+
+    #[test]
+    fn test_search() {
+        let db = open();
+
+        for bookmark in test_data() {
+            db.add_bookmark(&bookmark.title, &bookmark.url).unwrap();
+
+            let t_search = &db.search(vec![&bookmark.title])[0];
+            let u_search = &db.search(vec![&bookmark.url])[0];
+
+            assert_eq!((&bookmark.id, &bookmark.title, &bookmark.url),
+                       (&t_search.id, &t_search.title, &t_search.url));
+            assert_eq!((&bookmark.id, &bookmark.title, &bookmark.url),
+                       (&u_search.id, &u_search.title, &u_search.url));
+        }
+    }
+}
