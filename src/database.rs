@@ -145,9 +145,9 @@ impl DB {
         self.conn.query_row(query, &[&name], |r| r.get(0)).unwrap()
     }
 
-    pub fn update(&self, bookmark: &Bookmark) {
+    pub fn update_bookmark(&self, id: i64, title: &String, url: &String) {
         let query = "Update bookmarks SET title = $1, url = $2 WHERE id=?";
-        self.conn.execute(query, &[&bookmark.title, &bookmark.url, &bookmark.id])
+        self.conn.execute(query, &[title, url, &id])
             .expect("Failed to update");
     }
 
@@ -217,7 +217,7 @@ impl DB {
         self.conn.query_row(query, &[], |r| r.get(0)).unwrap()
     }
 
-    fn get_tags(&self, bookmark_id: i64) -> rusqlite::Result<Vec<String>> {
+    pub fn get_tags(&self, bookmark_id: i64) -> rusqlite::Result<Vec<String>> {
         let query = format!(
             "SELECT name FROM tags t LEFT JOIN bookmark_tag bt
             ON bt.tag_id=t.id WHERE bt.bookmark_id='{}'", bookmark_id

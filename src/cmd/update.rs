@@ -44,9 +44,11 @@ pub fn execute(args: &ArgMatches) {
             db.add_tag(id, t);
             tags.push(t.to_string());
         }
+    } else {
+        tags = db.get_tags(id).unwrap();
     }
 
     let bookmark = Bookmark::new(id, title, url, tags);
-    db.update(&bookmark);
+    db.update_bookmark(bookmark.id, &bookmark.title, &bookmark.url);
     bookmark.print();
 }
