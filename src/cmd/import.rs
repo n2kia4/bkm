@@ -1,4 +1,5 @@
 use clap::{App, ArgMatches, SubCommand};
+use std::path::Path;
 
 use database::DB;
 use utils::get_bookmarks_from_html;
@@ -11,8 +12,8 @@ pub fn make_subcommand<'a, 'b>() -> App<'a, 'b> {
 
 pub fn execute(args: &ArgMatches) {
     let db = DB::open();
-    let file_name = args.value_of("FILE").unwrap();
-    let bookmarks = get_bookmarks_from_html(file_name);
+    let path = Path::new(args.value_of("FILE").unwrap());
+    let bookmarks = get_bookmarks_from_html(path.to_path_buf());
 
     for bookmark in bookmarks {
         match db.add_bookmark(&bookmark.title, &bookmark.url) {
