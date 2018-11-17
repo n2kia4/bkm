@@ -28,6 +28,7 @@ fn main() {
         .subcommand(cmd::update::make_subcommand())
         .subcommand(cmd::open::make_subcommand())
         .subcommand(cmd::search::make_subcommand())
+        .subcommand(cmd::import::make_subcommand())
         .get_matches();
 
     match args.subcommand() {
@@ -37,6 +38,7 @@ fn main() {
         ("update", Some(args)) => cmd::update::execute(args),
         ("open", Some(args)) => cmd::open::execute(args),
         ("search", Some(args)) => cmd::search::execute(args),
+        ("import", Some(args)) => cmd::import::execute(args),
         _ => process::exit(1),
     }
 }

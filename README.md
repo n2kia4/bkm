@@ -40,6 +40,7 @@ SUBCOMMANDS:
     update    Update bookmark
     open      Open bookmark
     search    Search bookmark
+    import    Import bookmark
     help      Prints this message or the help of the given subcommand(s)
 ```
 
@@ -172,4 +173,12 @@ Search bookmarks that contains `rust` or `cli` in tag:
 
 ```
 $ bkm search -t rust cli
+```
+
+### `import`
+
+Import bookmarks from HTML file:
+
+```
+$ bkm import bookmarks.html
 ```
